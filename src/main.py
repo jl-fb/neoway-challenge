@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup 
 import pandas as pd
+import json
 import utility.strings as s 
 import utility.api as api
 
@@ -9,16 +10,22 @@ postFields = {"UF": "SC", "Localidade": ""}
 test = ["UF", "SC", "Localidade", ""]
 pagination = {"pagini": 0, "pagfim": 0, "results": 0, "qtdrow": 50}
 table = []
-
+js = []
 class Table:
     def __init__(self):
         self.localidade = ""
         self.faixaCep = "" 
         self.situacao = ""
         self.tipoFaixa = ""
-        
-        
-resultTeste = Table()
+    
+    def __repr__(self):
+        return '{"localidade": "%s", "faixaCep": "%s", "situacao": "%s", "tipoFaixa": "%s"}' % (self.localidade, self.faixaCep, self.situacao, self.tipoFaixa)
+    
+    def __out__(self):
+        return self.localidade, self.faixaCep, self.situacao, self.tipoFaixa
+    
+data = Table()
+teste = []
 
 resultHTML = api.Api(url, postFields).getResult()
 
@@ -38,21 +45,28 @@ resultHTML = resultHTML.decode("unicode_escape")
 soup = BeautifulSoup(resultHTML, 'lxml') 
 #table = soup.find("table", attrs=cl)
 #  
-dfs = pd.read_html(resultHTML)
-r = [i.values for i in dfs]
-print(r)
-
-for df in dfs:
-    table.append(df)
-    
-for rows in df.values:
-    for content in rows:
-        print(content)
-# print(pagination)
+# dfs = pd.read_html(resultHTML)
+# for df in dfs:
+#     table.append(df)
+#     
+# for rows in df.values:
+#     data.localidade = rows[0]
+#     data.faixaCep = rows[1]
+#     data.situacao = rows[2]
+#     data.tipoFaixa = rows[3]
+#     js.append(data.__repr__())
 # 
-#             
-# with open("result.txt", "w") as f:
-#     f.write(resultEscapedXML)
+# with open("table.jsonl", "w") as wf:
+#     for data in js:
+#         wf.write(f"{data}\n")
+        
+# result = [json.dumps(record) for record in js]
+# with open("table.jsonl", "w") as wf:
+#     for line in result:
+#         line = bytes(line, "utf-8").decode("unicode_escape")
+#         print(f"{line}\n")
+#         wf.write(f"{line}\n")
+#     
+#print(pagination)
 
-
-
+print() 
