@@ -47,3 +47,17 @@ class String_utils():
             print(f'[String_utils_class] Error in findeInHTMLReverse: Error: {error}')
         else:    
             return result
+        
+    def cleanHTML(html): # @NoSelf
+        try:    
+            #Cleaning the data for search an set the pagination dictionary
+            resultEscapedSpaces = String_utils.unescapeSpace(str(html))
+            resultEscapedUnicode = String_utils.decodeUnicode(resultEscapedSpaces)
+            resultEscapedXML = String_utils.unescapeXML(resultEscapedUnicode)
+        
+        except Exception as error:
+            print(f'[String_utils_class] Error in clean the HTML: Error: {error}')
+        
+        else:
+            return resultEscapedXML
+        

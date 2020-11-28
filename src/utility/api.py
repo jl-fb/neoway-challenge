@@ -11,5 +11,5 @@ class Api:
         
         if source.status_code != 200:
             return f'Error to reach URL: {self.URL}. Error {source.status_code} '
-        result = source.content.encodings("'utf-8")
+        result = source.content
         return result

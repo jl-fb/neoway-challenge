@@ -7,7 +7,7 @@ class UF_Infos:
     
     def __repr__(self):
         try:
-            return {'UF': '%s', 'faixa_cep_UF': '%s',  'localidade': '%s', 'faixa_cep_localidade': '%s', 'situacao': '%s', 'tipoFaixa': '%s'} % (self.uf, self.faixaCepUF, self.localidade, self.faixaCepLocalidade, self.situacao, self.tipoFaixa)
+#             return {'UF': '%s', 'faixa_cep_UF': '%s',  'localidade': '%s', 'faixa_cep_localidade': '%s', 'situacao': '%s', 'tipoFaixa': '%s'} % (self.uf, self.faixaCepUF, self.localidade, self.faixaCepLocalidade, self.situacao, self.tipoFaixa)
             return {'localidade': self.localidade, 'faixa_cep_localidade': self.faixaCep, 'situacao': self.situacao, 'tipoFaixa': self.tipoFaixa}
         
         except Exception as error:
