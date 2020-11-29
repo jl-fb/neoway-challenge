@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-
+from numpy import reshape, array
 class Table:
     
     def getTable(soup, tag, class_="tmptabela"): # @NoSelf
@@ -26,3 +26,25 @@ class Table:
             print(f'[Table_class] Error to get table rows. Error {error}')
         else:
             return rows
+        
+    def flatToMultiList(list,  size): # @NoSelf
+        try:
+            narray = array(list)
+            slices = round(len(list) / size)
+            return reshape(narray, (slices, size))
+        
+        except Exception as error:
+            print(f'[Table_class] Error to transform list. Error {error}') 
+        
+    def filteredList(source, pattern): # @NoSelf
+        res = []
+        temp = []
+        try:
+            for i in source:
+                if i[pattern] not in res:
+                    res.append(i[pattern])
+                    temp.append(i)
+            return temp
+        
+        except Exception as error:
+            print(f'[Table_class] Error to filter list. Error {error}')

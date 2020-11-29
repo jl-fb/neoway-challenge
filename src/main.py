@@ -1,11 +1,14 @@
 from bs4 import BeautifulSoup 
 import pandas as pd
+from itertools import groupby
 import json
 import utility.strings as s 
 import utility.api as api
 import utility.table as t
 import utility.uf_infos as uf_infos
 import utility.pagination as p
+import numpy
+from enum import unique
 
 url = 'http://www.buscacep.correios.com.br/sistemas/buscacep/resultadoBuscaFaixaCEP.cfm'
 postFields = {'UF': 'SC', 'Localidade': ''}
@@ -38,15 +41,7 @@ resultHTML = api.Api(url, postFields).getResult()
 # Cleaning the data for search an set the pagination dictionary
 resultEscapedXML = s.String_utils.cleanHTML(resultHTML)
 
-# #Cleaning the data for search an set the pagination dictionary
-# resultEscapedSpaces = s.String_utils.unescapeSpace(str(resultHTML))
-# resultEscapedUnicode = s.String_utils.decodeUnicode(resultEscapedSpaces)
-# resultEscapedXML = s.String_utils.unescapeXML(resultEscapedUnicode)
 
-#set the pagination variables
-# pagination['pagini'] = int(s.String_utils.findInHTML(resultEscapedXML, 'name=pagini value="', 2))
-# pagination['pagfim'] = int(s.String_utils.findInHTML(resultEscapedXML, 'name=pagfim value="', 3))
-# pagination['results'] = int(s.String_utils.findInHTMLReverse(resultEscapedXML, '<br><br><table class="tmptabela"', 4))
 print(resultEscapedXML)
 pagination = p.Pagination().getPagination(resultEscapedXML)
 
@@ -55,11 +50,13 @@ resultHTML = resultHTML.decode('unicode_escape')
 # Passing the data to BeautifulSoup for manipulation
 soup = BeautifulSoup(resultHTML, 'lxml') 
 #table = soup.find('table', attrs=cl)
-#  
+# 
+# r = []
 # dfs = pd.read_html(resultHTML)
 # for df in dfs:
-#     table.append(df)
-#     
+#     r.append(df)
+# 
+# print(df.values)
 # for rows in df.values:
 #     data.localidade = rows[0]
 #     data.faixaCep = rows[1]
@@ -71,12 +68,7 @@ soup = BeautifulSoup(resultHTML, 'lxml')
 #     for data in js:
 #         wf.write(f'{data}\n')
         
-# result = [json.dumps(record) for record in js]
-# with open('table.jsonl', 'w') as wf:
-#     for line in result:
-#         line = bytes(line, 'utf-8').decode('unicode_escape')
-#         print(f'{line}\n')
-#         wf.write(f'{line}\n')
+
 #     
 #print(pagination)
 
@@ -89,23 +81,25 @@ table_rows = t.Table.findAllTableRows(tableHTML)
  
 rows = t.Table.getTableRowsData(soup, 'td')
 
-print(rows)
-print(rows[0])
-print(rows[1])
-print(rows[4])
+rowsReshaped= t.Table.flatToMultiList(rows, 4)
 
-# for i in range(len(rows)):
-#     ufInformations.localidade = rows[0]
-#     ufInformations.faixaCep = rows[1]
-#     ufInformations.situacao = rows[2]
-#     ufInformations.tipoFaixa = rows[3]
-#     js.append(ufInformations.__repr__())
-#   
-# print(js) 
 
-# result = [json.dumps(record) for record in js]
-# with open('table.jsonl', 'w') as wf:
-#     for line in result:
-#         line = bytes(line, 'utf-8').decode('unicode_escape')
-#         print(f'{line}\n')
-#         wf.write(f'{line}\n')
+print(rowsReshaped)
+
+for line in rowsReshaped:
+    ufInformations.localidade = line[0]
+    ufInformations.faixaCep = line[1]
+    ufInformations.situacao = line[2]
+    ufInformations.tipoFaixa = line[3]
+    js.append(ufInformations.__repr__())
+
+
+filteredList = t.Table.filteredList(js, 'localidade')
+print(len(filteredList))
+
+result = [json.dumps(record) for record in filteredList]
+with open('table.jsonl', 'w') as wf:
+    for line in result:
+        line = bytes(line, 'utf-8').decode('unicode_escape')
+        print(f'{line}\n')
+        wf.write(f'{line}\n')
