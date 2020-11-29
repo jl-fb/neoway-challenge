@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from numpy import reshape, array
+
 class Table:
     
     def getTable(soup, tag, class_="tmptabela"): # @NoSelf
