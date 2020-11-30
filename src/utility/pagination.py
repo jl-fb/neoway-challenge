@@ -1,4 +1,5 @@
 from utility import strings as s
+from ossaudiodev import control_labels
 
 class Pagination:
   
@@ -27,9 +28,29 @@ class Pagination:
             
         else:
             return offset, pageEnd
+        
+    def pageControl2(currentPage, limit): # @NoSelf
+        
+        try:
+        # parsing to int
+            if type(currentPage) is not int:
+                currentPage = int(currentPage)
+            
+            if type(limit) is not int:
+                limit = int(limit)
+
+            nextPage = limit + currentPage 
+            pageEnd = nextPage + (limit - 1)
+            
+        except Exception as error:
+            print(f'[Pagination_class] PageControl Error {error}') 
+            
+        else:
+            return nextPage, pageEnd
     
     def hasNext(maxResults, currResults): # @NoSelf
         try:
+            
             if currResults < maxResults:
                 return True
             return False

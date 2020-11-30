@@ -9,7 +9,7 @@ from uuid import uuid4
 
 url = 'http://www.buscacep.correios.com.br/sistemas/buscacep/resultadoBuscaFaixaCEP.cfm'
 postFields = {'UF': 'SC', 'Localidade': ''}
-
+limit = 50
 """
     The first request need to be make in separeted of another because of 
     the model of the Correios's site and the way I've make the functions to get the data.
@@ -27,7 +27,8 @@ resultHTML = api.Api.getResult(url, postFields)
 resultEscapedXML = s.String_utils.cleanHTML(resultHTML)
 
 # Initializing the pagination infos
-pagination = p.Pagination(50).getPagination(resultEscapedXML)
+pagination = p.Pagination(limit).getPagination(resultEscapedXML)
+controlPage = pagination['results']
 
 resultHTML = resultHTML.decode('unicode_escape') 
 
@@ -51,6 +52,7 @@ for line in rowsReshaped:
 # Filtering the results to remove duplicate cities
 filteredList = t.Table.filteredList(results, 'localidade')
 
+
 allResults.append(filteredList)
 
 ### begin
@@ -59,7 +61,7 @@ def main(postFields):
 
     resultHTML = api.Api.getResult(url, postFields)
     resultHTML = resultHTML.decode('unicode_escape') 
-
+    
     soup =  BeautifulSoup(resultHTML, 'lxml')
 
     rows = t.Table.getTableRowsData(soup)
@@ -77,25 +79,34 @@ def main(postFields):
 
 # Filtering the results to remove duplicate cities
     filteredList = t.Table.filteredList(results, 'localidade')
-    
+ 
     return filteredList
 ### end  
 
-
-while p.Pagination.hasNext(pagination['results'], pagination['pagfim']):
+while controlPage > 0:
     postFields['pagini'] = pagination['pagini']
     postFields['pagfim'] = pagination['pagfim']
-     
+      
     results = main(postFields)
-     
-    pagination['pagini'], pagination['pagfim'] = p.Pagination.pageControl(pagination['pagfim'])
+      
+    pagination['pagini'], pagination['pagfim'] = p.Pagination.pageControl2(pagination['pagini'], limit)
     print('1',pagination)
-    print(p.Pagination.hasNext(pagination['results'], pagination['pagfim']))
+    controlPage = controlPage - limit
     allResults.append(results)
-    
-    
+# while p.Pagination.hasNext(pagination['results'], pagination['pagfim'], 50):
+#     postFields['pagini'] = pagination['pagini']
+#     postFields['pagfim'] = pagination['pagfim']
+#       
+#     results = main(postFields)
+#       
+#     pagination['pagini'], pagination['pagfim'] = p.Pagination.pageControl2(pagination['pagini'], 50)
+#     print('1',pagination)
+#     print(p.Pagination.hasNext(pagination['results'], pagination['pagfim'], 50))
+#     allResults.append(results)
+     
+     
 print(allResults)
-
+ 
 with open('results.jsonl','w') as wf:
     for data in allResults:
 #  Transform the object into a json and whrite to a file in jsonl format
@@ -103,7 +114,3 @@ with open('results.jsonl','w') as wf:
         for line in result:
             line = bytes(line, 'utf-8').decode('unicode_escape')
             wf.write(f'{line}\n')
-
-
-
- 
