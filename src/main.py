@@ -12,7 +12,7 @@ postFields = {'UF': 'SC', 'Localidade': ''}
 
 """
     The first request need to be make in separeted of another because of 
-    the model of the Correios's site and the way I make the functions to get the data.
+    the model of the Correios's site and the way I've make the functions to get the data.
     The queries to get the first data in the HTML requires that;
 """ 
 allResults = []
