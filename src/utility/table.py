@@ -3,19 +3,26 @@ from numpy import reshape, array
 
 class Table:
     
-    def getTable(soup, tag, class_="tmptabela"): # @NoSelf
+    def getTableByClass(soup, class_='tmptabela'): # @NoSelf
         try:
-            return soup.find(tag, class_)
+            return soup.find('table', class_)
+        except Exception as error:
+            print(f'[Table_class] Error to find table rows. Error {error}')
+    
+    def getTableByID(soup, id_='resultado-DNEC'): # @NoSelf
+        try:
+            return soup.find('table', id_)
         except Exception as error:
             print(f'[Table_class] Error to find table rows. Error {error}')
    
+   
     def findAllTableRows(table): # @NoSelf
         try:
-            return table.find_all("tr")
+            return table.find_all('tr')
         except Exception as error:
             print(f'[Table_class] Error to find table rows. Error {error}')
 
-    def getTableRowsData(soup, tag): # @NoSelf
+    def getFirstTableRowsData(soup, tag): # @NoSelf
         try:
             first_td = soup.find(tag)
             nexts_tds = first_td.find_all_next(tag)
@@ -27,11 +34,20 @@ class Table:
             print(f'[Table_class] Error to get table rows. Error {error}')
         else:
             return rows
-        
-    def flatToMultiList(list,  size): # @NoSelf
+    
+    def getTableRowsData(soup): # @NoSelf
         try:
-            narray = array(list)
-            slices = round(len(list) / size)
+            td = soup.find_all('td')
+            rows = [i.text for i in td]
+        except Exception as error:
+            print(f'[Table_class] Error to get table rows. Error {error}')
+        else:
+            return rows
+    
+    def flatToMultiList(source,  size): # @NoSelf
+        try:
+            narray = array(source)
+            slices = round(len(source) / size)
             return reshape(narray, (slices, size))
         
         except Exception as error:
