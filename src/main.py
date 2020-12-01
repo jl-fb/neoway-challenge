@@ -1,20 +1,24 @@
 from bs4 import BeautifulSoup 
 import json
+from uuid import uuid4
 import utility.strings as s 
 import utility.api as api
 import utility.table as t
 import utility.uf_infos as uf_infos
 import utility.pagination as p
-from uuid import uuid4
+import utility.constant as constant
 
-url = 'http://www.buscacep.correios.com.br/sistemas/buscacep/resultadoBuscaFaixaCEP.cfm'
+UFS = constant.UFS
+url = constant.URL 
 postFields = {'UF': 'SC', 'Localidade': ''}
 limit = 50
+
 """
     The first request need to be make in separeted of another because of 
     the model of the Correios's site and the way I've make the functions to get the data.
     The queries to get the first data in the HTML requires that;
 """ 
+# Variable to store data before write to a file
 allResults = []
 
 # Initializing uf class to to able to set information iof de ufs...
@@ -82,29 +86,23 @@ def main(postFields):
  
     return filteredList
 ### end  
+hasNext,_ =  hasNext, page  = p.Pagination.hasNext(pagination['results'], pagination['pagini'], pagination['pagfim'])
 
-while controlPage > 0:
+## Make all of the post request to get the data 
+while hasNext:
     postFields['pagini'] = pagination['pagini']
     postFields['pagfim'] = pagination['pagfim']
-      
+    hasNext, page  = p.Pagination.hasNext(pagination['results'], pagination['pagini'], pagination['pagfim'])
+    print(hasNext, page)
+    if hasNext == False:
+        pagination['pagini'] = page
+        print('PAGINATION', pagination['pagini'])
     results = main(postFields)
       
-    pagination['pagini'], pagination['pagfim'] = p.Pagination.pageControl2(pagination['pagini'], limit)
-    print('1',pagination)
+    pagination['pagini'], pagination['pagfim'] = p.Pagination.pageControl2(limit, pagination['pagini'], pagination['pagfim'], pagination['results'])
     controlPage = controlPage - limit
     allResults.append(results)
-# while p.Pagination.hasNext(pagination['results'], pagination['pagfim'], 50):
-#     postFields['pagini'] = pagination['pagini']
-#     postFields['pagfim'] = pagination['pagfim']
-#       
-#     results = main(postFields)
-#       
-#     pagination['pagini'], pagination['pagfim'] = p.Pagination.pageControl2(pagination['pagini'], 50)
-#     print('1',pagination)
-#     print(p.Pagination.hasNext(pagination['results'], pagination['pagfim'], 50))
-#     allResults.append(results)
-     
-     
+
 print(allResults)
  
 with open('results.jsonl','w') as wf:

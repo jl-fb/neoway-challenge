@@ -29,16 +29,15 @@ class Pagination:
         else:
             return offset, pageEnd
         
-    def pageControl2(currentPage, limit): # @NoSelf
-        
+    def pageControl2(limit, currentPage, pageEnd, maxResults): # @NoSelf
         try:
-        # parsing to int
-            if type(currentPage) is not int:
-                currentPage = int(currentPage)
             
-            if type(limit) is not int:
-                limit = int(limit)
-
+        # parsing to int
+            limit = Pagination.__toInt__(limit)
+            currentPage = Pagination.__toInt__(currentPage)
+            pageEnd = Pagination.__toInt__(pageEnd)
+            maxResults = Pagination.__toInt__(maxResults)
+             
             nextPage = limit + currentPage 
             pageEnd = nextPage + (limit - 1)
             
@@ -48,12 +47,25 @@ class Pagination:
         else:
             return nextPage, pageEnd
     
-    def hasNext(maxResults, currResults): # @NoSelf
+    def hasNext(maxResults, currentPage, pageEnd): # @NoSelf
         try:
+            maxResults = Pagination.__toInt__(maxResults)
+            currentPage = Pagination.__toInt__(currentPage)
+            pageEnd = Pagination.__toInt__(pageEnd)
+            if type(currentPage) is not int:
+                currentPage = int(currentPage)
             
-            if currResults < maxResults:
-                return True
-            return False
+            if currentPage < maxResults:
+                flag = True
+            else:    
+                flag = False
+            
+            if pageEnd > maxResults:
+                dif = maxResults - currentPage
+                pageEnd = dif + currentPage
+                print("PAGE END", pageEnd)
+                
+            return flag, pageEnd
         
         except Exception as error:
             print(f'[Pagination_class] Error verify if has next page. Error {error}') 
@@ -70,4 +82,12 @@ class Pagination:
         
         except Exception as error:
             print(f'[Pagination_class] Error to get pagination values. Error{error}')
-        
+    
+    def __toInt__(source): # @NoSelf
+        try:
+            if type(source) is not int:
+                return int(source)
+            return source
+        except Exception as error:
+            print(f'[Pagination_class] Error to convert values. Error{error}')
+            

@@ -1,11 +1,7 @@
 import requests
 
 class Api:
-    
-#     def __init__(self, url, postFields):
-#         self.URL = url 
-#         self.postFields = postFields
-    
+
     def getResult(url, postFields): # @NoSelf
         source = requests.post(url, data = postFields)
         

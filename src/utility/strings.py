@@ -44,7 +44,7 @@ class String_utils():
             index = int(source.index(pattern)) - pos
             result = source[index: int(source.index(pattern))]
         except Exception as error:
-            print(f'[String_utils_class] Error in findeInHTMLReverse: Error: {error}')
+            print(f'[String_utils_class] Error in findInHTMLReverse: Error: {error}')
         else:    
             return result
         
