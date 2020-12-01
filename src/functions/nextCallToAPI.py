@@ -3,34 +3,24 @@ from uuid import uuid4
 import utility.api as api
 import utility.table as t
 import utility.uf_infos as uf_infos
-import utility.strings as s
-import utility.pagination as p
 
-class Call_To_API:
-   
-    def firstCall(url, postFields, limit): # @NoSelf
+class Next_Call__To_API:
+    
+    def nexCall(url,postFields): # @NoSelf
+        results = []
+        filteredList = []
         # Initializing uf class to to able to set information iof de ufs...
         ufInformations = uf_infos.UF_Infos() 
-        # Make post request to get the result html page
         resultHTML = api.Api.getResult(url, postFields)
- 
-        # Cleaning the data for search an set the pagination dictionary
-        resultEscapedXML = s.String_utils.cleanHTML(resultHTML)
+        resultHTML = resultHTML.decode('unicode_escape') 
+    
+        soup =  BeautifulSoup(resultHTML, 'lxml')
 
-        # Initializing the pagination infos
-        pagination = p.Pagination(limit).getPagination(resultEscapedXML)
-        
-        # controlPage = pagination['results']
-        
-        # Passing the data to BeautifulSoup for manipulation
-        soup = BeautifulSoup(resultHTML, 'lxml') 
-
-        # Get the rows and td data 
-        rows = t.Table.getFirstTableRowsData(soup, 'td')
+        rows = t.Table.getTableRowsData(soup)
 
         # Transform the one dimentional array to multi, for to be able to store de each line of city info
         rowsReshaped = t.Table.flatToMultiList(rows, 4)
-        results = []
+
         for line in rowsReshaped:
             ufInformations.id = str(uuid4())
             ufInformations.localidade = line[0]
@@ -40,6 +30,6 @@ class Call_To_API:
             results.append(ufInformations.__repr__())
 
             # Filtering the results to remove duplicate cities
-            filteredList = t.Table.filteredList(results, 'localidade') 
-            
-        return filteredList, pagination
+            filteredList = t.Table.filteredList(results, 'localidade')
+ 
+        return filteredList
