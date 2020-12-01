@@ -9,7 +9,7 @@ postFields = {'UF': 'TO', 'Localidade': ''}
 limit = constant.LIMIT
 
 """
-    The first request need to be make in separeted of another because of 
+    The first request need to be made in separeted of another because of 
     the model of the Correios's site and the way I've make the functions to get the data.
     The queries to get the first data in the HTML requires that;
 """ 
